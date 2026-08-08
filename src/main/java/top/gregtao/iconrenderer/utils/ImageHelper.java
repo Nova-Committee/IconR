@@ -41,6 +41,23 @@ public class ImageHelper {
         }
     }
 
+    public ImageHelper(FluidJsonMeta jsonMeta) {
+        this.frameHelper1 = new FrameHelper(128, jsonMeta.fluid);
+        this.frameHelper2 = new FrameHelper(32, jsonMeta.fluid);
+
+        try (NativeImage image = fromFrame(this.frameHelper1.framebuffer, true)) {
+            jsonMeta.largeIcon = Base64.getEncoder().encodeToString(image.asByteArray());
+        } catch (IOException e) {
+            IconRenderer.LOGGER.warn(String.format("Failed to export large fluid icon for %s", jsonMeta.regName), e);
+        }
+
+        try (NativeImage image = fromFrame(this.frameHelper2.framebuffer, true)) {
+            jsonMeta.smallIcon = Base64.getEncoder().encodeToString(image.asByteArray());
+        } catch (IOException e) {
+            IconRenderer.LOGGER.warn(String.format("Failed to export small fluid icon for %s", jsonMeta.regName), e);
+        }
+    }
+
     public static NativeImage fromFrame(RenderTarget frame, boolean flipY) {
         NativeImage img = new NativeImage(frame.width, frame.height, false);
         RenderSystem.bindTexture(frame.getColorTextureId());
